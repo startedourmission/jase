@@ -151,16 +151,22 @@ function frontView(tilt, col) {
 }
 
 /* ---------- 타임라인 (초) ---------- */
-const DURATION = 26.5;
+const DURATION = 31.5;
 const T = {
-  zoom: 0.9, zoomEnd: 2.5,                                   // 0) 전체 화면 → 노치로 다가감
-  face: 2.9, good: 4.2, saved: 5.6, close: 6.9,             // 1) 기준 자세 재기
-  slide: 8.4, step: 2.0, move: .7,                           // 2) 조각이 한 칸씩 지나감 (다가감·기울임·내려앉음·눈), 아래에 사람
-  dry: 15.7, dryDur: 2.6, blink: 19.3, eyeOut: 20.4,         // 3) 눈
-  words: 20.9, wordsOut: 23.3, brand: 23.7,
+  zoom: 1.6, zoomEnd: 3.4,                                   // 0) 전체 화면 → 노치로 다가감
+  face: 4.3, good: 5.6, saved: 7.0, close: 8.3,             // 1) 기준 자세 재기
+  slide: 11.3, step: 2.6, move: .7,                          // 2) 조각이 한 칸씩 지나감 (다가감·기울임·내려앉음·눈), 아래에 사람
+  dry: 20.2, dryDur: 2.8, blink: 24.0, eyeOut: 25.5,         // 3) 눈
+  words: 25.9, wordsOut: 28.4, brand: 28.8,
 };
-// 자막 [시작, 끝, 문장] — 내레이션을 입힐 때 채움
-const SUBS = [];
+// 자막 [시작, 끝, 문장] — 내레이션 배치(segs.txt)와 같은 시점. 주소에 ?nosub 을 붙이면 끔
+const SUBS = [
+  [0.3, 1.3, 'Meet jase.'], [1.6, 4.1, "It lives right beside your MacBook's notch."],
+  [4.3, 6.15, 'Sit up straight for a few seconds,'], [6.15, 8.45, 'and it remembers your best posture.'],
+  [8.7, 11.4, 'Then it quietly watches how you sit.'],
+  [11.6, 13.95, 'Lean in, and the icon grows red.'], [14.2, 16.4, 'Tilt your head, and it tilts with you.'], [16.8, 18.6, 'Slouch, and it sinks.'],
+  [19.9, 23.45, 'Stare too long without blinking, and the eye turns red.'], [23.8, 25.4, "Blink, and it's green again."],
+];
 const NOSUB = new URLSearchParams(location.search).has('nosub');
 
 function frame(t) {
@@ -194,8 +200,8 @@ function frame(t) {
   setHTML($('front'), frontView(tiltA, color(clamp((tiltA - 6) / 16))));
   const whoIn = T.close + .35, whoOut = start(4) + .1, fr = vis(t, start(2) + .15, start(3) + .15, .22, .22);
   const whoS = popIn(t, whoIn) * (1 - .12 * prog(t, whoOut, .3, 'lin')), whoO = vis(t, whoIn, whoOut, .2, .3);
-  place($('wSide'), CX, CY + 64, whoS * lerp(1, .9, fr), whoO * (1 - fr));
-  place($('wFront'), CX, CY + 64, whoS * lerp(.9, 1, fr), whoO * fr);
+  place($('wSide'), CX, CY + 40, whoS * lerp(1, .9, fr), whoO * (1 - fr));
+  place($('wFront'), CX, CY + 40, whoS * lerp(.9, 1, fr), whoO * fr);
   drawNotch(N[1], t, { ...BIG, close: mv(1), label: 'Lean in', shut: blink(t, [arrive(1) + .1]) });
   drawNotch(N[2], t, { ...BIG, tilt: 20 * mv(2), label: 'Tilt your head', shut: blink(t, [arrive(2) + .9]) });
   drawNotch(N[3], t, { ...BIG, drop: mv(3), label: 'Slouch', shut: blink(t, [arrive(3) + .8]) });
