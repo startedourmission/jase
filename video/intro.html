@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jase intro</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #fff; }
+body { font-family: "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+#stage { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+/* 화면 단위(su) 1 = 영상 2.6px. UI는 앱 실제 크기(pt)로 그리고 zoom으로 키움 */
+#ui { position: absolute; left: 0; top: 0; width: 738.46px; height: 415.38px; zoom: 2.6; transform-origin: 50% 50%; }
+.w { position: absolute; left: 0; top: 0; will-change: transform; }
+
+/* 노치 조각 (NotchView.swift): 검은 바탕, 왼쪽 귀 66pt에 아이콘 둘, 펼치면 아래로 50pt */
+.nz { position: relative; }
+.notch { position: relative; background: #000; overflow: hidden; color: #fff;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16), 0 2px 6px rgba(0,0,0,.1); }
+.ear { position: absolute; left: 0; top: 0; width: 66px; height: 38px; padding-left: 6px; display: flex; align-items: center; gap: 10px; }
+.ear svg { display: block; flex: none; }
+.guide { position: absolute; left: 18px; right: 18px; top: 38px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; white-space: nowrap; }
+.guide .t { font-size: 13px; font-weight: 600; }
+.guide .d { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.6); margin-top: 2px; }
+.guide .long { font-size: 10.4px; font-weight: 600; }
+.guide .bar { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,.18); margin-top: 6px; overflow: hidden; }
+.guide .bar i { display: block; height: 100%; border-radius: 2px; background: rgb(64,219,107); }
+.guide .saved { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.lbl { position: absolute; left: -60px; right: -60px; top: 100%; margin-top: 10px; text-align: center; font-size: 9px; font-weight: 600; color: #8a8a8e; white-space: nowrap; }
+
+/* 설정 창 조각 (SettingsView.swift, 묶음 Form) */
+.set { width: 480px; border-radius: 12px; background: #fff; padding: 18px 20px 20px; font-size: 13px; color: #1d1d1f;
+  box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 10px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08); }
+.set .sec { font-weight: 700; margin: 0 0 9px 10px; }
+.set .grp { background: #f5f5f5; border-radius: 10px; padding: 0 10px; }
+.row { padding: 11px 0 10px; border-bottom: 1px solid #e6e6e6; }
+.row:last-child { border-bottom: 0; }
+.row .hd { display: flex; justify-content: space-between; }
+.row .val { color: #8a8a8e; font-variant-numeric: tabular-nums; }
+.sl { position: relative; margin: 11px 0 0 43%; height: 16px; }
+.sl .tr { position: absolute; left: 0; right: 0; top: 2px; height: 5px; border-radius: 3px; background: #dedede; }
+.sl .fi { position: absolute; left: 0; top: 2px; height: 5px; border-radius: 3px; background: #bdbdbd; }
+.sl .tk { position: absolute; left: 9px; right: 9px; top: 11px; height: 2px; background: radial-gradient(circle, #b5b5b5 .8px, transparent 1px) 0 0 / var(--step) 2px repeat-x; }
+.sl .kn { position: absolute; top: -3px; width: 20px; height: 15px; margin-left: -10px; border-radius: 8px; background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.25); }
+.note { font-size: 11px; color: #8a8a8e; margin-top: 3px; }
+.about { display: flex; gap: 14px; padding: 12px 0; align-items: flex-start; }
+.about img { width: 56px; height: 56px; flex: none; }
+.about b { display: block; font-weight: 700; margin-bottom: 4px; }
+.about a { display: block; color: #0a66d8; font-size: 12px; margin-top: 4px; }
+#cursor { width: 17px; height: 24px; transform-origin: 0 0; filter: drop-shadow(0 1.5px 2px rgba(0,0,0,.35)); }
+
+#sub { position: absolute; left: 0; right: 0; bottom: 46px; text-align: center; font-size: 38px; font-weight: 600; letter-spacing: -.4px; color: #1d1d1f; }
+#words { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 104px; font-weight: 700; letter-spacing: -2.5px; color: #111; }
+#words span { display: inline-block; }
+#words .hl { color: #2fc45c; }
+#brand { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 14px; }
+#brand img { width: 210px; height: 210px; }
+#brand h1 { font-size: 120px; font-weight: 800; letter-spacing: -3px; color: #111; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ui">
+    <div id="notches"></div>
+    <div class="w" id="wSet"><div style="zoom:.76"><div class="set"><div class="sec">Posture</div><div class="grp">
+      <div class="row"><div class="hd"><span>Distance to screen</span><span class="val" id="pct">20%</span></div>
+        <div class="sl" id="sl"><div class="tr"></div><div class="fi" id="fi"></div><div class="tk" style="--step:calc(100% / 55)"></div><div class="kn" id="kn"></div></div>
+        <div class="note">Turns red when you're this much closer than your baseline.</div></div>
+      <div class="row"><div class="hd"><span>Head tilt</span><span class="val">22°</span></div>
+        <div class="sl"><div class="tr"></div><div class="fi" style="width:40%"></div><div class="tk" style="--step:calc(100% / 30)"></div><div class="kn" style="left:40%"></div></div>
+        <div class="note">Turns red when your head tilts this far.</div></div>
+      <div class="row"><div class="hd"><span>Slouch</span><span class="val">about 7.5 cm</span></div>
+        <div class="sl"><div class="tr"></div><div class="fi" style="width:37.5%"></div><div class="tk" style="--step:calc(100% / 24)"></div><div class="kn" style="left:37.5%"></div></div>
+        <div class="note">Turns red when your face drops this far below your baseline.</div></div>
+    </div></div></div></div>
+    <div class="w" id="wAbout"><div style="zoom:.92"><div class="set"><div class="sec">About</div><div class="grp"><div class="about">
+      <img src="../docs/icon.png"><div><b>jase 0.1</b>A quiet posture and blink monitor that lives in your notch
+      <div class="note">Video is processed on this Mac only. Nothing is saved or sent anywhere.</div><a>Website</a></div></div></div></div></div></div>
+    <div class="w" id="wCur"><svg id="cursor" viewBox="0 0 17 24"><path d="M1 1v19l4.6-4.3 3 7 2.9-1.3-3-6.8H15z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div id="sub"></div>
+  <div id="words"><span>You focus.</span><span class="hl">It notices.</span></div>
+  <div id="brand"><img src="../docs/icon.png"><h1>jase</h1></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, p) => a + (b - a) * p;
+const E = {
+  lin: p => p, out: p => 1 - Math.pow(1 - p, 3),
+  io: p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2,
+  back: p => { const c = 1.7; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); },
+};
+const prog = (t, t0, d, e = 'out') => E[e](clamp((t - t0) / d));
+const popIn = (t, t0, d = .55) => lerp(.55, 1, prog(t, t0, d, 'back'));
+const vis = (t, t0, t1, din = .18, dout = .25) => clamp((t - t0) / din) * (1 - clamp((t - t1) / dout));
+function setHTML(el, html) { if (el._h !== html) { el.innerHTML = html; el._h = html; } }
+function place(el, x, y, s = 1, o = 1, r = 0) {
+  el.style.opacity = o; el.style.visibility = o <= 0.001 ? 'hidden' : '';
+  el.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%) rotate(${r}deg) scale(${s})`;
+}
+const CX = 369.23, CY = 207.69;
+
+/* ---------- 앱과 같은 그림 (NotchView.swift, docs/index.html) ---------- */
+// 0(초록) → 0.55(노랑) → 1(빨강)
+function color(value) {
+  const green = [64, 219, 107], yellow = [255, 209, 56], red = [255, 69, 64];
+  const [a, b, p] = value < 0.55 ? [green, yellow, value / 0.55] : [yellow, red, (value - 0.55) / 0.45];
+  return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * p)).join(',')})`;
+}
+const GRAY = 'rgba(142,142,147,.7)';
+// 자세 아이콘: tilt(도), drop(0~1), close(0~1)
+function posture(tilt, drop, close) {
+  const head = `translate(0 ${drop * 5.5}) rotate(${tilt * 1.3} 12 19) translate(12 16) scale(${1 + 0.3 * close}) translate(-12 -16)`;
+  return `<path fill="currentColor" d="M2 24v-1a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v1z"/>
+    <g transform="${head}"><circle cx="12" cy="10" r="6" fill="currentColor" stroke="#000" stroke-width="3" paint-order="stroke"/>
+    <circle cx="10.4" cy="9.5" r="1" fill="#000"/><circle cx="13.6" cy="9.5" r="1" fill="#000"/></g>`;
+}
+const EYE = [`<path fill="currentColor" d="M1 7C4.5 1.2 17.5 1.2 21 7c-3.5 5.8-16.5 5.8-20 0z"/><circle cx="11" cy="7" r="3" fill="#000"/><circle cx="11" cy="7" r="1.2" fill="currentColor"/>`,
+  `<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5q8 9 16 0"/><path d="M6.5 8.5l-1.6 2.8M11 10v3.2M15.5 8.5l1.6 2.8"/></g>`];
+
+const NW = 250, EAR = 66, NH = 38;   // 노치 폭(조각으로 잘라 낸 값), 귀, 높이
+const N = [0, 1, 2, 3, 4, 5].map(i => {
+  const w = document.createElement('div'); w.className = 'w';
+  w.innerHTML = `<div class="nz"><div class="notch"><div class="ear"><svg class="po" width="24" height="24" viewBox="0 0 24 24"></svg><svg class="ey" width="22" height="14" viewBox="0 0 22 14"></svg></div><div class="guide"></div></div><div class="lbl"></div></div>`;
+  $('notches').appendChild(w);
+  const q = s => w.querySelector(s);
+  return { w, nz: q('.nz'), notch: q('.notch'), po: q('.po'), ey: q('.ey'), guide: q('.guide'), lbl: q('.lbl') };
+});
+// 노치 하나를 그림. open 0~1 (안내가 펼쳐진 정도), plevel/dry 0~1 (색), active=false면 회색
+function drawNotch(n, t, { zoom = 1.3, nw = NW, open = 0, tilt = 0, drop = 0, close = 0, dry = 0, shut = false, active = true, guide = '', label = '' }) {
+  const flash = Math.floor(t / .4) % 2 === 0;
+  const plevel = Math.max(close, drop, clamp((Math.abs(tilt) - 6) / 16));
+  n.nz.style.zoom = zoom;
+  n.notch.style.width = nw + EAR * (1 + open) + 'px';
+  n.notch.style.height = NH + 50 * open + 'px';
+  n.notch.style.borderRadius = `0 0 ${lerp(12, 18, open)}px ${lerp(12, 18, open)}px`;
+  setHTML(n.po, posture(tilt, drop, close));
+  n.po.style.color = active ? color(plevel) : GRAY;
+  n.po.style.opacity = active && plevel >= 1 && !flash ? .15 : 1;
+  setHTML(n.ey, EYE[shut ? 1 : 0]);
+  n.ey.style.color = active ? color(dry) : GRAY;
+  n.ey.style.opacity = active && dry >= 1 && !flash ? .15 : 1;
+  setHTML(n.guide, guide); n.guide.style.opacity = clamp(open * 2 - 1);
+  setHTML(n.lbl, label);
+}
+const BIG = { zoom: 1.9, nw: 150 };   // 지나가는 조각은 노치를 더 잘라 내고 아이콘을 키움
+const blink = (t, at) => at.some(b => t >= b && t < b + .28);
+
+/* ---------- 타임라인 (초) ---------- */
+const DURATION = 34;
+const T = {
+  face: 1.5, good: 2.9, saved: 4.4, close: 5.7,             // 1) 기준 자세 재기
+  slide: 7.0, step: 1.65, move: .7,                          // 2) 조각이 한 칸씩 지나감 (다가감·기울임·내려앉음·눈)
+  dry: 13.9, dryDur: 2.6, blink: 17.5, eyeOut: 18.6,         // 3) 눈
+  set: 18.9, drag: 21.0, dragEnd: 22.8, setOut: 24.6,        // 4) 설정: 기준을 끌어서 바꿈
+  about: 24.9, aboutOut: 27.9,                               // 5) Mac 안에서만
+  words: 28.4, wordsOut: 30.8, brand: 31.2,
+};
+// 자막 [시작, 끝, 문장] — 내레이션을 입힐 때 채움
+const SUBS = [];
+const NOSUB = new URLSearchParams(location.search).has('nosub');
+
+function frame(t) {
+  $('ui').style.transform = `scale(${1 + .035 * prog(t, 0, T.words, 'lin')})`;
+  const sub = NOSUB ? null : SUBS.find(([a, b]) => t >= a && t < b);
+  if ($('sub')._t !== (sub ? sub[2] : '')) { $('sub').textContent = $('sub')._t = sub ? sub[2] : ''; }
+
+  /* 1) 처음 켜면 기준 자세를 잼 → 저장 → 접히고 초록 */
+  const open = 1 - prog(t, T.close, .45, 'io');
+  const pr = clamp((t - T.face) / (T.saved - T.face));
+  let guide;
+  if (t < T.face) guide = `<div class="t">Let's set your baseline</div><div class="d">Sit so the camera can see your face</div>`;
+  else if (t < T.saved) guide = `<div class="long">${t < T.good ? 'Sit up straight and look at the screen from your usual distance' : 'Good. Hold still for a moment'}</div><div class="bar"><i style="width:${(Math.round(pr * 40) / 40 * 100).toFixed(1)}%"></i></div>`;
+  else guide = `<div class="saved"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="rgb(64,219,107)"/><path d="M4.6 8.3l2.3 2.3 4.5-4.9" fill="none" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Saved your baseline posture</div>`;
+  drawNotch(N[0], t, { open, guide, active: t >= T.saved, shut: blink(t, [6.25]) });
+
+  /* 2) 한 칸씩 지나가며 자세 셋을 보여 주고, 눈에서 멈춤 */
+  const arrive = k => T.slide + (k - 1) * T.step + T.move;           // k번째 조각이 가운데에 서는 때
+  let c = 0; for (let k = 0; k < 4; k++) c += prog(t, T.slide + k * T.step, T.move, 'io');
+  const mv = k => prog(t, arrive(k) - .15, .9, 'io');
+  drawNotch(N[1], t, { ...BIG, close: mv(1), label: 'Lean in', shut: blink(t, [arrive(1) + .1]) });
+  drawNotch(N[2], t, { ...BIG, tilt: 20 * mv(2), label: 'Tilt your head', shut: blink(t, [arrive(2) + .5]) });
+  drawNotch(N[3], t, { ...BIG, drop: mv(3), label: 'Slouch', shut: blink(t, [arrive(3) + .2]) });
+
+  /* 3) 눈: 안 깜빡이면 빨개지다 점멸, 깜빡이면 초록 */
+  const blinked = t >= T.blink;
+  const dry = blinked ? 0 : clamp((t - T.dry) / T.dryDur);
+  const secs = Math.min(10, Math.floor(dry * 10));
+  drawNotch(N[4], t, { ...BIG, dry, shut: blink(t, [arrive(4) + .3, T.blink]),
+    label: t < T.dry ? 'Blink' : blinked ? 'Blink — back to green' : `${secs}s since your last blink` });
+
+  const leave = prog(t, T.eyeOut, .3, 'lin');
+  [0, 1, 2, 3, 4].forEach(i => {
+    const d = i - c, near = 1 - Math.min(Math.abs(d), 1);
+    let o, s = lerp(.8, 1, near);
+    if (i === 0) { o = vis(t, .15, arrive(1) + .1, .2, .3); s *= popIn(t, .15); }
+    else if (i < 4) o = vis(t, T.slide + (i - 1) * T.step - .1, arrive(i + 1) + .1, .3, .3);
+    else { o = vis(t, T.slide + 3 * T.step - .1, T.eyeOut, .3, .3); s *= 1 - .12 * leave; }
+    const h = i === 0 ? (NH + 50 * open) * 1.3 : NH * 1.9;
+    place(N[i].w, CX + d * 470, CY - 36 + h / 2, s, o);
+  });
+
+  /* 4) 설정: 거리 기준을 끌어 늘리면, 다가가 있던 아이콘이 따라 풀림 */
+  const so = vis(t, T.set, T.setOut, .2, .3), sout = 1 - .12 * prog(t, T.setOut, .3, 'lin');
+  const pct = Math.round(lerp(20, 40, prog(t, T.drag + .15, T.dragEnd - T.drag - .15, 'io')));
+  const near = clamp(20 / pct);                                     // 기준보다 20% 가까이 앉아 있음
+  drawNotch(N[5], t, { zoom: 1.5, nw: 120, close: near, shut: blink(t, [T.set + 1.2, T.dragEnd + .9]), label: '20% closer than your baseline' });
+  place(N[5].w, 166, CY - 10, popIn(t, T.set) * sout, so);
+  place($('wSet'), 536, CY, popIn(t, T.set + .15) * sout, vis(t, T.set + .15, T.setOut, .2, .3));
+  const f = (pct - 5) / 55 * 100;
+  $('pct').textContent = pct + '%'; $('fi').style.width = f + '%'; $('kn').style.left = f + '%';
+  const held = t >= T.drag && t < T.dragEnd + .12;
+  $('kn').style.transform = held ? 'scale(1.08)' : '';
+  // 커서는 손잡이를 따라감 (손잡이 자리는 지금 화면에서 잼: t만으로 정해짐)
+  const u = $('ui').getBoundingClientRect(), k = $('kn').getBoundingClientRect();
+  const kx = (k.x + k.width / 2 - u.x) / u.width * 738.46, ky = (k.y + k.height / 2 - u.y) / u.height * 415.38 + 1;
+  const a = prog(t, T.set + .9, T.drag - T.set - .9, 'io'), b = prog(t, T.dragEnd + .5, T.setOut - T.dragEnd - .5, 'io');
+  const cx = lerp(660, kx, a) + 40 * b, cy = lerp(370, ky, a) + 60 * b;
+  $('wCur').style.transform = `translate(${cx}px,${cy}px) scale(${held ? .84 : 1})`;
+  $('wCur').style.opacity = vis(t, T.set + .9, T.setOut, .2, .2);
+
+  /* 5) Mac 안에서만 */
+  place($('wAbout'), CX, CY + Math.sin(t * 2.2) * 2.5, popIn(t, T.about) * (1 - .12 * prog(t, T.aboutOut, .3, 'lin')), vis(t, T.about, T.aboutOut, .2, .3));
+
+  /* 6) 문장 → 이름 */
+  [...$('words').children].forEach((el, i) => {
+    const t0 = T.words + i * .95, out = prog(t, T.wordsOut, .35, 'lin');
+    el.style.opacity = clamp((t - t0) / .2) * (1 - out);
+    el.style.transform = `translateY(${(1 - prog(t, t0, .6)) * 40 - out * 20}px) scale(${lerp(.9, 1, prog(t, t0, .6, 'back'))})`;
+  });
+  const [img, h1] = $('brand').children;
+  img.style.opacity = clamp((t - T.brand) / .2);
+  img.style.transform = `scale(${lerp(.3, 1, prog(t, T.brand, .8, 'back'))}) rotate(${lerp(-60, 0, prog(t, T.brand, .9))}deg)`;
+  h1.style.opacity = clamp((t - T.brand - .45) / .3);
+  h1.style.transform = `translateX(${(1 - prog(t, T.brand + .45, .6)) * -30}px)`;
+}
+
+window.frame = frame; window.DURATION = DURATION;
+frame(0);
+const q = new URLSearchParams(location.search);
+if (q.has('t')) frame(+q.get('t'));
+else if (!q.has('still')) { const s = performance.now(); (function loop() { frame(((performance.now() - s) / 1000) % DURATION); requestAnimationFrame(loop); })(); }
+</script>
+</body>
+</html>
