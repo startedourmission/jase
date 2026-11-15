@@ -8,6 +8,8 @@
 
 소개 페이지: https://startedourmission.github.io/jase/
 
+받기: [jase.dmg](https://github.com/startedourmission/jase/releases/latest/download/jase.dmg) (무료, Apple 공증)
+
 ## 빌드
 
 macOS 14 이상, Xcode 명령줄 도구.
@@ -16,6 +18,8 @@ macOS 14 이상, Xcode 명령줄 도구.
 ./build.sh            # build/jase.app (ad-hoc 서명)
 open build/jase.app
 ```
+
+배포 파일은 `./release.sh` (Developer ID 서명 → DMG → 공증, 준비물은 스크립트 머리말 참고).
 
 처음 켜면 카메라 허용을 묻고, 노치 아래 안내에 따라 몇 초 동안 기준 자세를 잰다. 다시 빌드하면 카메라 허용을 다시 물을 수 있다.
 

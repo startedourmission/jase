@@ -57,6 +57,7 @@
     border: 1px solid var(--ink); text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
   }
   .pill.dark { background: var(--ink); color: #fff; }
+  .pill.dark:hover { background: #333; }
   .pill:not(.dark):hover { background: #f5f5f5; }
   .pill[aria-disabled="true"] { opacity: .4; pointer-events: none; }
   .pill svg { width: 15px; height: 15px; }
@@ -147,7 +148,7 @@
       <span class="ko">자세와 눈 깜빡임을 노치 옆 작은 아이콘 둘로 보여 줘요.</span>
     </p>
     <div class="buttons">
-      <a class="pill dark" href="#" aria-disabled="true"><span class="en">Download · Coming soon</span><span class="ko">다운로드 · 준비 중</span></a>
+      <a class="pill dark" href="https://github.com/startedourmission/jase/releases/latest/download/jase.dmg"><span class="en">Download · Free</span><span class="ko">무료 다운로드</span></a>
       <a class="pill" href="https://github.com/startedourmission/jase">
         <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
         <span class="en">Source</span><span class="ko">소스</span>
@@ -218,9 +219,11 @@
   </div>
 
   <div class="closing">
-    <h2><span class="en">Build it yourself</span><span class="ko">직접 빌드하기</span></h2>
-    <p class="en">A signed download is on the way. Until then, build from source with Xcode's command line tools.</p>
-    <p class="ko">서명된 다운로드는 준비 중이에요. 그때까지는 Xcode 명령줄 도구로 소스에서 빌드할 수 있어요.</p>
+    <h2><span class="en">Free and open source</span><span class="ko">무료, 그리고 오픈소스</span></h2>
+    <p class="en">The download is signed and notarized by Apple. Open the DMG and drag jase to Applications.</p>
+    <p class="ko">다운로드 파일은 Apple 공증을 받았어요. DMG를 열고 jase를 응용 프로그램으로 끌어 놓으면 돼요.</p>
+    <p class="en">Or build it from source with Xcode's command line tools.</p>
+    <p class="ko">Xcode 명령줄 도구로 소스에서 직접 빌드할 수도 있어요.</p>
 <pre>git clone https://github.com/startedourmission/jase
 cd jase && ./build.sh
 open build/jase.app</pre>
